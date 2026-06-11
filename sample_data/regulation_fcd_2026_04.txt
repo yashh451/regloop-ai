@@ -1,0 +1,40 @@
+FINANCIAL CONDUCT DIRECTIVE 2026/04
+Customer Data Protection and Operational Resilience Requirements
+
+1. Scope and Purpose
+1.1 This directive applies to all licensed financial institutions operating within the
+jurisdiction. It establishes minimum requirements for customer data protection,
+record keeping, incident management and third-party oversight.
+
+2. Record Keeping
+2.1 Institutions must retain all customer transaction records for a minimum period of
+seven years from the date of the transaction.
+2.2 Records must be stored in a tamper-evident format and must remain retrievable
+within five business days of a regulatory request.
+
+3. Customer Data Protection
+3.1 Institutions must encrypt all personal data of customers both at rest and in
+transit using industry-standard encryption algorithms.
+3.2 Institutions shall obtain explicit consent from data subjects before processing
+personal data for any purpose beyond the original service agreement.
+3.3 Access to customer personal data must be restricted to authorized personnel on a
+need-to-know basis, and all access must be logged.
+
+4. Incident Reporting
+4.1 Institutions must notify the regulator of any data breach affecting customer
+information within seventy-two hours of discovery.
+4.2 A root cause analysis report shall be submitted to the regulator within thirty
+days of any reportable incident.
+
+5. Third-Party Oversight
+5.1 Institutions are required to perform due diligence on all third-party service
+providers that process customer data before engagement and at least annually
+thereafter.
+5.2 Outsourcing agreements must include audit rights enabling the institution and the
+regulator to inspect the service provider's controls.
+
+6. Governance and Training
+6.1 Senior management shall review the institution's data protection posture at least
+quarterly and document the outcomes of each review.
+6.2 All employees must complete data protection training within thirty days of
+joining and annually thereafter.

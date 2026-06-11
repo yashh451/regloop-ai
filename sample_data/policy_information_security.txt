@@ -1,0 +1,18 @@
+INFORMATION SECURITY POLICY
+Version 5.0 — Internal Policy Document
+
+2. Data Protection
+
+2.1 All personal data of customers is encrypted at rest using AES-256 encryption.
+
+2.4 Access to systems containing customer data is granted based on role and reviewed
+quarterly. Access events are logged centrally.
+
+3. Incident Management
+
+3.2 Security incidents must be reported to the internal Security Operations Center
+immediately upon discovery. The SOC triages incidents and coordinates response.
+
+4. Awareness
+
+4.1 Employees receive security awareness training during onboarding.

@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegLoop AI — Compliance Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0F1E; --bg-grad:radial-gradient(1200px 600px at 80% -10%,rgba(46,91,255,.10),transparent 60%),radial-gradient(900px 500px at -10% 110%,rgba(194,42,60,.08),transparent 60%);
+    --panel:#111A30; --panel-2:#0D1527; --panel-3:#16213C;
+    --ink:#E8EDF6; --muted:#93A1BC; --faint:#5C6B8A; --line:#1F2B47; --line-2:#27355A;
+    --side:#070C18; --side-ink:#7E8DA9; --side-line:#15203A;
+    --brand:#E23B4E; --brand-dark:#C22A3C; --brand-glow:rgba(226,59,78,.4);
+    --ai:#4D7CFF; --ai-bg:rgba(77,124,255,.12); --ai-line:rgba(77,124,255,.35);
+    --high:#FF6B5E; --high-bg:rgba(255,107,94,.12); --high-line:rgba(255,107,94,.35);
+    --med:#FFB454;  --med-bg:rgba(255,180,84,.12);  --med-line:rgba(255,180,84,.35);
+    --low:#3DD68C;  --low-bg:rgba(61,214,140,.12);  --low-line:rgba(61,214,140,.35);
+    --violet:#A78BFA; --violet-bg:rgba(167,139,250,.12); --violet-line:rgba(167,139,250,.35);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);
+    --pop-shadow:0 24px 64px rgba(0,0,0,.55);
+    --display:"Space Grotesk",sans-serif;
+    --body:"Inter",-apple-system,"Segoe UI",sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+    --r:14px;
+  }
+  [data-theme="light"]{
+    --bg:#EEF1F7; --bg-grad:radial-gradient(1200px 600px at 80% -10%,rgba(46,91,255,.07),transparent 60%);
+    --panel:#FFFFFF; --panel-2:#F6F8FC; --panel-3:#EDF1F8;
+    --ink:#16202E; --muted:#5A6B85; --faint:#94A3B8; --line:#E2E8F0; --line-2:#D3DCE8;
+    --side:#0D1424; --side-ink:#8FA0B8; --side-line:#1B2742;
+    --brand:#C22A3C; --brand-dark:#A31E2F; --brand-glow:rgba(194,42,60,.3);
+    --ai:#2E5BFF; --ai-bg:#EBF0FF; --ai-line:#C3D2FF;
+    --high:#D92D20; --high-bg:#FEECEA; --high-line:#F6C5C0;
+    --med:#B45309;  --med-bg:#FCF0DC;  --med-line:#EDD3A6;
+    --low:#15803D;  --low-bg:#E4F3E9;  --low-line:#BBDFC6;
+    --violet:#6D28D9; --violet-bg:#F4EFFD; --violet-line:#DDD0F7;
+    --shadow:0 1px 2px rgba(22,32,46,.05),0 8px 24px rgba(22,32,46,.07);
+    --pop-shadow:0 24px 64px rgba(22,32,46,.18);
+  }
+  *{box-sizing:border-box;margin:0}
+  html,body{height:100%}
+  body{background:var(--bg);background-image:var(--bg-grad);background-attachment:fixed;
+    color:var(--ink);font:14px/1.6 var(--body)}
+  button{font:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  a{color:var(--ai);text-decoration:none}
+  :focus-visible{outline:2px solid var(--ai);outline-offset:2px;border-radius:4px}
+  ::selection{background:rgba(77,124,255,.35)}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+
+  .app{display:grid;grid-template-columns:260px 1fr;height:100vh}
+  @media(max-width:940px){.app{grid-template-columns:66px 1fr}
+    .side .label,.side .count,.side .brand-text,.side .foot,.side .nav-sec{display:none!important}
+    .side .nav-item{justify-content:center;padding:12px 0}}
+
+  /* ============ Sidebar ============ */
+  .side{background:var(--side);display:flex;flex-direction:column;overflow-y:auto;
+    border-right:1px solid var(--side-line)}
+  .brand{display:flex;align-items:center;gap:11px;padding:20px 18px 16px}
+  .brand .mark{width:36px;height:36px;flex:none;border-radius:10px;
+    background:linear-gradient(135deg,var(--brand) 0%,#6E1322 100%);
+    display:grid;place-items:center;box-shadow:0 6px 18px var(--brand-glow)}
+  .brand-text b{display:block;font:700 16px var(--display);color:#F1F5FB;letter-spacing:.01em}
+  .brand-text span{font:500 10px var(--mono);color:var(--side-ink);
+    text-transform:uppercase;letter-spacing:.16em}
+  .nav{padding:8px 10px 14px;display:flex;flex-direction:column;gap:2px}
+  .nav-sec{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.15em;
+    color:#46587A;padding:16px 12px 6px}
+  .nav-item{display:flex;align-items:center;gap:11px;width:100%;padding:9px 12px;
+    border-radius:9px;color:var(--side-ink);font-weight:500;text-align:left;
+    transition:background .15s,color .15s;position:relative}
+  .nav-item:hover:not(:disabled){background:#101A30;color:#D7E0EC}
+  .nav-item.active{background:linear-gradient(90deg,rgba(226,59,78,.16),rgba(226,59,78,.04));color:#FFF}
+  .nav-item.active::before{content:"";position:absolute;left:-10px;top:7px;bottom:7px;
+    width:3px;border-radius:3px;background:var(--brand);box-shadow:0 0 10px var(--brand-glow)}
+  .nav-item:disabled{opacity:.32;cursor:not-allowed}
+  .nav-item svg{flex:none}
+  .nav-item .count{margin-left:auto;font:600 11px var(--mono);background:#16213C;
+    color:#9AACCB;border-radius:20px;padding:1px 8px;min-width:24px;text-align:center}
+  .nav-item .count.alert{background:var(--brand);color:#fff;box-shadow:0 0 12px var(--brand-glow)}
+  .side .foot{margin-top:auto;padding:14px 16px;border-top:1px solid var(--side-line)}
+  .foot-card{background:#0C1426;border:1px solid var(--side-line);border-radius:12px;
+    padding:12px 14px;font:500 11px var(--mono);color:#6E7F9E;line-height:2}
+  .foot-card .dot{display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:#3DD68C;margin-right:7px;box-shadow:0 0 8px #3DD68C}
+  .foot-card b{color:#C9D6E8;font-weight:600}
+
+  /* ============ Topbar ============ */
+  .content{display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative}
+  .topbar{background:color-mix(in srgb,var(--panel) 75%,transparent);backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);padding:0 24px;height:62px;display:flex;
+    align-items:center;gap:12px;flex:none;z-index:10}
+  .topbar h1{font:600 17px var(--display)}
+  .crumb{font:500 10.5px var(--mono);color:var(--faint);text-transform:uppercase;letter-spacing:.13em}
+  .topbar .grow{flex:1}
+  .kbtn{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--line);
+    border-radius:10px;padding:7px 12px;color:var(--muted);background:var(--panel-2);
+    font-size:13px;min-width:180px}
+  .kbtn kbd{margin-left:auto;font:600 10.5px var(--mono);border:1px solid var(--line-2);
+    border-radius:5px;padding:1px 6px;color:var(--faint);background:var(--panel)}
+  @media(max-width:760px){.kbtn{min-width:0}.kbtn .kb-label{display:none}}
+  .icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel-2);display:grid;place-items:center;color:var(--muted);position:relative;
+    transition:color .15s,border-color .15s}
+  .icon-btn:hover{color:var(--ink);border-color:var(--line-2)}
+  .icon-btn .ping{position:absolute;top:7px;right:8px;width:8px;height:8px;border-radius:50%;
+    background:var(--brand);box-shadow:0 0 8px var(--brand-glow)}
+  .avatar-btn{display:flex;align-items:center;gap:9px;border:1px solid var(--line);
+    border-radius:24px;padding:4px 12px 4px 4px;background:var(--panel-2)}
+  .avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+    font:700 11px var(--mono);color:#fff;background:linear-gradient(135deg,#4D7CFF,#7B4DFF);flex:none}
+  .avatar.sm{width:22px;height:22px;font-size:9px}
+  .avatar-btn .a-name{font-weight:600;font-size:13px}
+  @media(max-width:860px){.avatar-btn .a-name{display:none}}
+
+  /* popovers */
+  .pop{position:absolute;top:54px;right:0;width:340px;background:var(--panel);
+    border:1px solid var(--line-2);border-radius:14px;box-shadow:var(--pop-shadow);
+    padding:8px;z-index:40;animation:pop .16s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+  .pop h4{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.12em;
+    color:var(--faint);padding:8px 10px 6px}
+  .pop .row{display:flex;gap:10px;padding:9px 10px;border-radius:9px;align-items:flex-start;font-size:13px}
+  .pop .row:hover{background:var(--panel-2)}
+  .pop .row b{font-weight:600}
+  .pop .row p{color:var(--muted);font-size:12px}
+  .pop .row time{margin-left:auto;font:500 10.5px var(--mono);color:var(--faint);white-space:nowrap}
+  .pop button.row{width:100%;text-align:left}
+  .pop .sep{height:1px;background:var(--line);margin:6px 4px}
+
+  main{flex:1;overflow-y:auto;padding:26px 28px 70px}
+  .wrap{max-width:1140px;margin:0 auto}
+  .page-head{margin-bottom:20px;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .page-head h2{font:600 25px/1.2 var(--display);letter-spacing:-.01em}
+  .page-head p{color:var(--muted);max-width:66ch;margin-top:5px}
+  .page-head .ph-actions{margin-left:auto;display:flex;gap:9px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:20px 22px;margin-bottom:16px;position:relative}
+  .card.flat{box-shadow:none}
+  .card.clickable{cursor:pointer;transition:border-color .15s,transform .15s}
+  .card.clickable:hover{border-color:var(--ai-line);transform:translateY(-1px)}
+  .card h3{font:600 15px var(--display);margin-bottom:4px}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;
+    border-radius:10px;padding:9px 16px;border:1px solid transparent;
+    transition:transform .1s,box-shadow .15s,background .15s,border-color .15s}
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:var(--brand);color:#fff;box-shadow:0 6px 20px var(--brand-glow)}
+  .btn.primary:hover{background:var(--brand-dark)}
+  .btn.dark{background:var(--ink);color:var(--bg)}
+  .btn.ghost{border-color:var(--line-2);background:var(--panel);color:var(--ink)}
+  .btn.ghost:hover{background:var(--panel-2)}
+  .btn.danger{border-color:var(--high-line);color:var(--high);background:transparent}
+  .btn.danger:hover{background:var(--high-bg)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+  .btn.sm{padding:6px 12px;font-size:12.5px;border-radius:8px}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font:600 10.5px var(--mono);
+    border-radius:7px;padding:3px 9px;border:1px solid var(--line-2);
+    background:var(--panel-2);color:var(--muted);letter-spacing:.03em;white-space:nowrap}
+  .chip.cite{color:var(--ai);border-color:var(--ai-line);background:var(--ai-bg)}
+  .chip.domain{color:var(--violet);border-color:var(--violet-line);background:var(--violet-bg)}
+  .b-high{color:var(--high);background:var(--high-bg);border-color:var(--high-line)}
+  .b-med,.b-medium{color:var(--med);background:var(--med-bg);border-color:var(--med-line)}
+  .b-low{color:var(--low);background:var(--low-bg);border-color:var(--low-line)}
+  .ring{display:inline-flex;align-items:center;gap:6px;font:600 11.5px var(--mono);color:var(--muted)}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .track{stroke:var(--line)} .ring .val{stroke:var(--ai);stroke-linecap:round}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+  .search{position:relative;flex:1;min-width:200px;max-width:360px}
+  .search input{width:100%;border:1px solid var(--line-2);border-radius:10px;
+    padding:9px 12px 9px 36px;font:13.5px var(--body);background:var(--panel);color:var(--ink)}
+  .search input::placeholder{color:var(--faint)}
+  .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--faint)}
+  .seg{display:inline-flex;background:var(--panel);border:1px solid var(--line-2);
+    border-radius:10px;padding:3px;gap:2px;flex-wrap:wrap}
+  .seg button{font:600 12.5px var(--body);padding:6px 12px;border-radius:8px;color:var(--muted)}
+  .seg button.on{background:var(--ink);color:var(--bg)}
+  .pill{display:inline-flex;align-items:center;gap:7px;font:600 11px var(--mono);
+    border:1px solid var(--line-2);border-radius:20px;padding:4px 12px;color:var(--muted);
+    background:var(--panel-2);white-space:nowrap}
+  .pill .dot{width:7px;height:7px;border-radius:50%}
+  .pill.engine-gemini .dot{background:var(--ai);box-shadow:0 0 8px var(--ai)}
+  .pill.engine-heuristic .dot{background:var(--med)}
+
+  /* dashboard */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:16px}
+  .kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
+    box-shadow:var(--shadow);padding:17px 19px;position:relative;overflow:hidden}
+  .kpi::after{content:"";position:absolute;inset:0 0 auto;height:2.5px;background:var(--accent,transparent)}
+  .kpi .k-label{font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.12em;color:var(--faint)}
+  .kpi .k-val{font:700 32px/1.2 var(--display);margin-top:5px;font-variant-numeric:tabular-nums}
+  .kpi .k-sub{font-size:12px;color:var(--muted);margin-top:2px}
+  .charts{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+  @media(max-width:900px){.charts{grid-template-columns:1fr}}
+  .legend{display:flex;flex-direction:column;gap:8px;font-size:13px}
+  .legend .row{display:flex;align-items:center;gap:9px}
+  .legend .sw{width:11px;height:11px;border-radius:3px;flex:none}
+  .legend .n{margin-left:auto;font:600 12.5px var(--mono)}
+  .hbar{height:10px;border-radius:6px;background:var(--panel-3);overflow:hidden;display:flex;margin:6px 0 2px}
+  .hbar i{display:block;height:100%}
+  .activity{display:flex;flex-direction:column;gap:0}
+  .act-row{display:flex;gap:11px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;align-items:flex-start}
+  .act-row:last-child{border-bottom:none}
+  .act-dot{width:9px;height:9px;border-radius:50%;margin-top:6px;flex:none}
+  .act-row time{margin-left:auto;font:500 10.5px var(--mono);color:var(--faint);white-space:nowrap}
+
+  /* upload */
+  .upload-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .drop{background:var(--panel);border:1.5px dashed var(--line-2);border-radius:var(--r);
+    padding:22px;text-align:center;transition:border-color .15s,background .15s;position:relative}
+  .drop.over{border-color:var(--ai);background:var(--ai-bg)}
+  .drop .ic{width:46px;height:46px;border-radius:12px;background:var(--panel-2);
+    border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 10px;color:var(--muted)}
+  .drop h4{font:600 14.5px var(--display)}
+  .drop p{font-size:12.5px;color:var(--muted);margin:3px 0 12px}
+  .drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .drop .fake-btn{pointer-events:none;display:inline-block;font:600 12.5px var(--body);
+    border:1px solid var(--line-2);border-radius:9px;padding:7px 14px;background:var(--panel-2)}
+  .file-row{display:flex;align-items:center;gap:10px;background:var(--panel-2);
+    border:1px solid var(--line);border-radius:11px;padding:9px 13px;margin-top:8px;text-align:left;
+    position:relative;z-index:2}
+  .file-row .f-ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+    font:700 9px var(--mono);color:#fff;flex:none}
+  .file-row .f-name{font:500 13px var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .file-row .f-meta{font:500 10.5px var(--mono);color:var(--faint)}
+  .file-row button{margin-left:auto;color:var(--faint);padding:5px;border-radius:7px}
+  .file-row button:hover{color:var(--high);background:var(--high-bg)}
+
+  /* pipeline runner */
+  .runner{max-width:580px;margin:36px auto}
+  .run-step{display:flex;gap:14px;align-items:flex-start;padding:15px 6px;border-bottom:1px solid var(--line)}
+  .run-step:last-child{border-bottom:none}
+  .run-step .st-ic{width:32px;height:32px;border-radius:50%;flex:none;display:grid;
+    place-items:center;border:2px solid var(--line-2);color:var(--faint);
+    font:700 12px var(--mono);background:var(--panel);transition:all .25s}
+  .run-step.doing .st-ic{border-color:var(--ai);color:var(--ai);box-shadow:0 0 14px rgba(77,124,255,.35)}
+  .run-step.done .st-ic{border-color:var(--low);background:var(--low);color:#062515}
+  .run-step b{font:600 14px var(--display)}
+  .run-step p{font-size:12.5px;color:var(--muted)}
+  .spin{width:14px;height:14px;border:2px solid var(--ai-bg);border-top-color:var(--ai);
+    border-radius:50%;animation:spin .7s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .reveal{animation:rise .35s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){.spin{animation:none}.reveal,.pop,.drawer,.modal{animation:none!important}}
+
+  /* obligations / gaps */
+  .ob-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+  .ob-head .grow{flex:1}
+  .statement{font-size:14.5px;line-height:1.65}
+  .excerpt{font-size:13px;background:var(--panel-2);border:1px solid var(--line);
+    border-left:3px solid var(--ai);padding:11px 14px;margin-top:10px;border-radius:9px}
+  .excerpt b{font:600 12.5px var(--display)}
+  .evidence{font:500 10.5px var(--mono);color:var(--faint);display:block;margin-top:6px}
+  .explain{font-size:13px;color:var(--muted);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:9px;padding:10px 14px;margin-top:10px}
+  .trace-hint{font:500 11px var(--mono);color:var(--faint);position:absolute;top:16px;right:18px;
+    opacity:0;transition:opacity .15s}
+  .card.clickable:hover .trace-hint{opacity:1}
+
+  /* review */
+  .progress{height:8px;border-radius:5px;background:var(--panel-3);overflow:hidden;flex:1}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--low),#26A55A);
+    border-radius:5px;transition:width .4s}
+  .diff{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  @media(max-width:780px){.diff{grid-template-columns:1fr}}
+  .diff>div{border-radius:11px;padding:12px 14px;font-size:13px;line-height:1.6}
+  .diff .before{background:var(--high-bg);border:1px solid var(--high-line)}
+  .diff .after{background:var(--low-bg);border:1px solid var(--low-line)}
+  .diff h5{font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px}
+  .diff .before h5{color:var(--high)} .diff .after h5{color:var(--low)}
+  .stamp{display:inline-block;font:700 12px var(--display);text-transform:uppercase;
+    letter-spacing:.16em;border:2.5px solid currentColor;border-radius:7px;
+    padding:5px 13px;transform:rotate(-2.5deg)}
+  .stamp.approved,.stamp.modified{color:var(--low)}
+  .stamp.rejected{color:var(--high)} .stamp.escalated{color:var(--med)}
+  .stamp.pending{color:var(--faint);border-style:dashed;transform:none;letter-spacing:.1em}
+  .pr-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px;align-items:center}
+  textarea{width:100%;border:1px solid var(--line-2);border-radius:10px;padding:10px 13px;
+    font:13.5px var(--body);margin-top:12px;resize:vertical;background:var(--panel-2);color:var(--ink)}
+  textarea::placeholder{color:var(--faint)}
+  textarea:focus{border-color:var(--ai);outline:none;box-shadow:0 0 0 3px var(--ai-bg)}
+  .owner-tag{display:inline-flex;align-items:center;gap:7px;font-weight:600;font-size:12.5px}
+
+  /* audit timeline */
+  .timeline{position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;
+    background:var(--line);border-radius:2px}
+  .tl-item{position:relative;padding:9px 0 9px 8px}
+  .tl-item::before{content:"";position:absolute;left:-23px;top:16px;width:11px;height:11px;
+    border-radius:50%;border:2.5px solid var(--panel);box-shadow:0 0 0 1.5px var(--line-2)}
+  .tl-item.ai::before{background:var(--ai)} .tl-item.analyst::before{background:var(--brand)}
+  .tl-item.system::before{background:var(--faint)}
+  .tl-head{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+  .tl-head b{font:600 13.5px var(--body)}
+  .tl-head .who{font:600 10px var(--mono);text-transform:uppercase;letter-spacing:.1em;
+    border-radius:5px;padding:1px 7px}
+  .tl-item.ai .who{color:var(--ai);background:var(--ai-bg)}
+  .tl-item.analyst .who{color:var(--brand);background:var(--high-bg)}
+  .tl-item.system .who{color:var(--muted);background:var(--panel-2)}
+  .tl-head time{font:500 10.5px var(--mono);color:var(--faint);margin-left:auto}
+  .tl-item p{font-size:13px;color:var(--muted)}
+
+  .empty{display:grid;place-items:center;text-align:center;padding:60px 20px;color:var(--muted)}
+  .empty .e-ic{width:56px;height:56px;border-radius:15px;background:var(--panel);
+    border:1px solid var(--line);display:grid;place-items:center;margin-bottom:12px;color:var(--faint)}
+
+  /* skeleton */
+  .skel{border-radius:10px;background:linear-gradient(100deg,var(--panel-2) 40%,var(--panel-3) 50%,var(--panel-2) 60%);
+    background-size:200% 100%;animation:shimmer 1.3s infinite}
+  @keyframes shimmer{to{background-position:-200% 0}}
+
+  /* drawer */
+  .drawer-veil,.modal-veil{position:fixed;inset:0;background:rgba(4,8,18,.6);
+    backdrop-filter:blur(3px);z-index:60;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .drawer{position:fixed;top:0;right:0;bottom:0;width:min(520px,94vw);background:var(--panel);
+    border-left:1px solid var(--line-2);z-index:61;box-shadow:var(--pop-shadow);
+    display:flex;flex-direction:column;animation:slide .25s cubic-bezier(.2,.8,.25,1)}
+  @keyframes slide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+  .drawer-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;
+    gap:12px;align-items:center}
+  .drawer-head h3{font:600 16px var(--display)}
+  .drawer-body{padding:20px 22px;overflow-y:auto}
+  .trace-step{position:relative;padding:0 0 22px 24px;border-left:2px solid var(--line);margin-left:8px}
+  .trace-step:last-child{border-left-color:transparent;padding-bottom:4px}
+  .trace-step::before{content:"";position:absolute;left:-7px;top:2px;width:12px;height:12px;
+    border-radius:50%;background:var(--ai);box-shadow:0 0 0 4px var(--ai-bg)}
+  .trace-step h4{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.13em;
+    color:var(--faint);margin-bottom:7px}
+
+  /* command palette */
+  .modal{position:fixed;left:50%;top:14vh;transform:translateX(-50%);width:min(620px,92vw);
+    background:var(--panel);border:1px solid var(--line-2);border-radius:16px;z-index:70;
+    box-shadow:var(--pop-shadow);overflow:hidden;animation:pop .18s ease}
+  .modal .cmd-in{display:flex;align-items:center;gap:11px;padding:15px 18px;
+    border-bottom:1px solid var(--line);color:var(--faint)}
+  .modal .cmd-in input{flex:1;border:none;background:none;font:15px var(--body);
+    color:var(--ink);outline:none}
+  .cmd-list{max-height:330px;overflow-y:auto;padding:8px}
+  .cmd-item{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;
+    border-radius:10px;text-align:left;color:var(--muted)}
+  .cmd-item svg{flex:none}
+  .cmd-item.sel{background:var(--ai-bg);color:var(--ink)}
+  .cmd-item .ci-k{margin-left:auto;font:600 10px var(--mono);color:var(--faint);
+    text-transform:uppercase;letter-spacing:.1em}
+  .cmd-foot{display:flex;gap:14px;padding:9px 16px;border-top:1px solid var(--line);
+    font:500 10.5px var(--mono);color:var(--faint)}
+  .cmd-foot kbd{border:1px solid var(--line-2);border-radius:4px;padding:0 5px}
+
+  /* auth */
+  .auth{position:fixed;inset:0;z-index:100;display:grid;grid-template-columns:1.05fr .95fr;
+    background:var(--bg);background-image:var(--bg-grad)}
+  @media(max-width:880px){.auth{grid-template-columns:1fr}.auth-left{display:none}}
+  .auth-left{background:linear-gradient(160deg,#0B1226 0%,#131B33 55%,#1A1023 100%);
+    padding:54px 58px;display:flex;flex-direction:column;border-right:1px solid var(--side-line);
+    position:relative;overflow:hidden}
+  .auth-left::after{content:"";position:absolute;width:520px;height:520px;border-radius:50%;
+    right:-180px;bottom:-220px;background:radial-gradient(circle,rgba(226,59,78,.16),transparent 65%)}
+  .auth-left .brand{padding:0;margin-bottom:auto}
+  .auth-left h2{font:700 34px/1.2 var(--display);color:#F1F5FB;max-width:14ch;letter-spacing:-.01em}
+  .auth-left .tag{color:#93A1BC;margin:14px 0 30px;max-width:46ch;font-size:15px}
+  .auth-feat{display:flex;gap:12px;align-items:flex-start;margin-bottom:16px;color:#AEBBD2;font-size:13.5px;z-index:1}
+  .auth-feat .fi{width:30px;height:30px;border-radius:9px;background:rgba(77,124,255,.14);
+    border:1px solid rgba(77,124,255,.3);display:grid;place-items:center;color:#7FA0FF;flex:none}
+  .auth-right{display:grid;place-items:center;padding:30px}
+  .auth-card{width:min(400px,100%);background:var(--panel);border:1px solid var(--line-2);
+    border-radius:18px;box-shadow:var(--pop-shadow);padding:32px 30px}
+  .auth-card h3{font:600 21px var(--display)}
+  .auth-card .sub{color:var(--muted);font-size:13.5px;margin:5px 0 22px}
+  .auth-card label{font:600 11px var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--faint)}
+  .auth-card input{width:100%;border:1px solid var(--line-2);border-radius:10px;
+    padding:11px 13px;font:14px var(--body);background:var(--panel-2);color:var(--ink);
+    margin:6px 0 16px}
+  .auth-note{font-size:11.5px;color:var(--faint);text-align:center;margin-top:16px}
+
+  .toasts{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:10px;z-index:90}
+  .toast{background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:11px;
+    font-size:13.5px;max-width:380px;box-shadow:var(--pop-shadow);
+    display:flex;gap:10px;align-items:center;animation:rise .25s ease}
+  .toast.err{background:#7F1D1D;color:#fff}
+  code{font:500 12px var(--mono);background:var(--panel-2);border:1px solid var(--line);
+    border-radius:5px;padding:1px 6px;color:var(--ink)}
+</style>
+</head>
+<body>
+<div id="auth-root"></div>
+<div class="app" id="app" hidden>
+  <aside class="side">
+    <div class="brand">
+      <div class="mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+      <div class="brand-text"><b>RegLoop AI</b><span>Compliance OS</span></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="foot"><div class="foot-card" id="side-foot"></div></div>
+  </aside>
+  <div class="content">
+    <div class="topbar" id="topbar"></div>
+    <main><div class="wrap" id="main"></div></main>
+  </div>
+</div>
+<div id="overlay-root"></div>
+<div class="toasts" id="toasts"></div>
+<script>
+"use strict";
+/* ============================================================
+   RegLoop AI — Compliance Intelligence Console (v3)
+   vanilla JS · no build step · talks to the FastAPI backend
+============================================================ */
+const $  = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+const ICONS = {
+  dash:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>',
+  upload:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+  doc:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>',
+  map:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>',
+  gap:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+  review:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+  audit:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>',
+  export:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  search:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>',
+  x:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+  bolt:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+  check:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  box:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><line x1="12" y1="13" x2="12" y2="21"/></svg>',
+  bell:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  sun:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>',
+  moon:'<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>',
+  chev:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>',
+  shield:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+  arrow:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
+  plus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+};
+
+const PAGES = [
+  {id:"dashboard",  icon:"dash",   label:"Dashboard",      sec:"Overview", needs:true},
+  {id:"upload",     icon:"upload", label:"Documents",      sec:"Workflow"},
+  {id:"obligations",icon:"doc",    label:"Obligations",    needs:true, count:s=>s.obligations.length},
+  {id:"mappings",   icon:"map",    label:"Policy mapping", needs:true, count:s=>s.obligations.filter(o=>o.mappings.length).length},
+  {id:"gaps",       icon:"gap",    label:"Gap analysis",   needs:true, count:s=>s.obligations.filter(o=>o.gap && o.gap.coverage!=="fully_covered").length},
+  {id:"review",     icon:"review", label:"Review queue",   needs:true, count:s=>s.prs.filter(p=>p.status==="pending").length, alert:true},
+  {id:"audit",      icon:"audit",  label:"Audit trail",    sec:"Records", count:s=>s.audit.length},
+  {id:"export",     icon:"export", label:"Export package", needs:true},
+];
+
+const COV_META = {
+  fully_covered:{label:"Fully covered", cls:"b-low",  cvar:"--low"},
+  partially_covered:{label:"Partially covered", cls:"b-med", cvar:"--med"},
+  not_covered:{label:"Not covered", cls:"b-high", cvar:"--high"},
+};
+
+const state = {
+  sessions:[], session:null, obligations:[], prs:[], audit:[],
+  page:"upload", busy:false, booted:false,
+  q:"", riskFilter:"all", covFilter:"all", prTab:"pending", auditFilter:"all",
+  pop:null, // "bell" | "user" | null
+};
+
+const cssVar = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const user = { name:"A. Sharma", role:"Compliance Analyst", initials:"AS" };
+
+/* ---------------- API ---------------- */
+async function api(path, opts={}){
+  const res = await fetch(path, opts);
+  if(!res.ok){
+    let d = res.statusText;
+    try{ d = (await res.json()).detail || d; }catch(e){}
+    throw new Error(d);
+  }
+  const ct = res.headers.get("content-type") || "";
+  return ct.includes("json") ? res.json() : res.text();
+}
+const analyzed = () => state.obligations.length > 0;
+
+async function refresh(goto){
+  const id = state.session.id;
+  const [sess, obs, prs, audit, sessions] = await Promise.all([
+    api(`/api/sessions/${id}`), api(`/api/sessions/${id}/obligations`),
+    api(`/api/sessions/${id}/pull-requests`), api(`/api/sessions/${id}/audit`),
+    api("/api/sessions"),
+  ]);
+  state.session = sess; state.obligations = obs; state.prs = prs;
+  state.audit = audit; state.sessions = sessions;
+  if(goto) state.page = goto;
+  if(!analyzed() && (PAGES.find(p=>p.id===state.page)||{}).needs) state.page = "upload";
+  render();
+}
+
+async function newSession(){
+  const name = prompt("Name for the new review session:", "Q2 Regulatory Review");
+  if(name === null) return;
+  const fd = new FormData(); fd.append("name", name || "Compliance Review");
+  state.session = await api("/api/sessions", {method:"POST", body:fd});
+  state.page = "upload";
+  await refresh();
+  toast("New review session created.");
+}
+
+/* ---------------- helpers ---------------- */
+function toast(msg, err=false){
+  const t = document.createElement("div");
+  t.className = "toast" + (err ? " err" : "");
+  t.innerHTML = (err?ICONS.gap:ICONS.check) + `<span>${esc(msg)}</span>`;
+  $("#toasts").appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition="opacity .3s"; }, 3400);
+  setTimeout(()=> t.remove(), 3800);
+}
+function ring(v, size=30){
+  const r=(size-6)/2, c=2*Math.PI*r, pct=Math.round(v*100);
+  return `<span class="ring" title="Confidence ${pct}%"><svg width="${size}" height="${size}">
+    <circle class="track" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke-width="3.5"/>
+    <circle class="val" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke-width="3.5"
+      stroke-dasharray="${(c*pct/100).toFixed(1)} ${c.toFixed(1)}"/></svg>${pct}%</span>`;
+}
+const riskChip = r => `<span class="chip b-${r==="medium"?"med":r}">${r.toUpperCase()}</span>`;
+const covChip = c => { const m=COV_META[c]; return m?`<span class="chip ${m.cls}">${m.label.toUpperCase()}</span>`:""; };
+const initials = n => n.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase();
+const rel = iso => {
+  const s = (Date.now() - new Date(iso).getTime())/1000;
+  if(s<60) return "just now"; if(s<3600) return `${Math.floor(s/60)}m ago`;
+  if(s<86400) return `${Math.floor(s/3600)}h ago`; return new Date(iso).toLocaleDateString();
+};
+function emptyState(title, sub, cta=""){
+  return `<div class="empty"><div class="e-ic">${ICONS.box}</div>
+    <b style="font:600 16px var(--display)">${esc(title)}</b>
+    <p style="max-width:46ch;margin-top:4px">${sub}</p>${cta}</div>`;
+}
+function countUp(el, target){
+  const dur = 650, t0 = performance.now();
+  const step = t => {
+    const k = Math.min((t-t0)/dur, 1);
+    el.textContent = Math.round(target * (1-Math.pow(1-k,3)));
+    if(k<1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+</script>
+<script>
+"use strict";
+/* ================= chrome: nav, topbar, popovers ================= */
+function renderNav(){
+  let html = "", lastSec = null;
+  for(const p of PAGES){
+    if(p.sec && p.sec !== lastSec){ html += `<div class="nav-sec">${p.sec}</div>`; lastSec = p.sec; }
+    const locked = p.needs && !analyzed();
+    const n = p.count && analyzed() ? p.count(state) : null;
+    const count = n !== null ? `<span class="count ${p.alert && n>0 ? "alert":""}">${n}</span>` : "";
+    html += `<button class="nav-item ${state.page===p.id?"active":""}" data-page="${p.id}" ${locked?"disabled":""}>
+      ${ICONS[p.icon]}<span class="label">${p.label}</span>${count}</button>`;
+  }
+  $("#nav").innerHTML = html;
+  $("#side-foot").innerHTML = `
+    <div><span class="dot"></span>API connected</div>
+    <div>engine <b>${esc(state.session?.ai_engine || "—")}</b></div>
+    <div>file no. <b>${String(state.session?.id ?? 0).padStart(4,"0")}</b></div>`;
+}
+
+function renderTopbar(){
+  const page = PAGES.find(p=>p.id===state.page);
+  const eng = state.session.ai_engine;
+  const theme = document.documentElement.dataset.theme;
+  $("#topbar").innerHTML = `
+    <div><div class="crumb">${esc(state.session.name)} / ${esc(state.session.status)}</div>
+      <h1>${page ? page.label : ""}</h1></div>
+    <div class="grow"></div>
+    <button class="kbtn" id="open-cmd">${ICONS.search}<span class="kb-label">Search &amp; commands</span><kbd>Ctrl K</kbd></button>
+    <span class="pill engine-${esc(eng)}"><span class="dot"></span>${eng==="gemini"?"Gemini":"Offline"} engine</span>
+    <button class="icon-btn" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">${theme==="dark"?ICONS.sun:ICONS.moon}</button>
+    <button class="icon-btn" id="bell" title="Activity" aria-label="Activity">
+      ${ICONS.bell}${state.audit.length?'<span class="ping"></span>':""}</button>
+    <button class="avatar-btn" id="user-btn"><span class="avatar">${user.initials}</span>
+      <span class="a-name">${user.name}</span>${ICONS.chev}</button>
+    <div id="pop-slot" style="position:relative"></div>`;
+
+  $("#open-cmd").onclick = openPalette;
+  $("#theme-toggle").onclick = toggleTheme;
+  $("#bell").onclick = e => { e.stopPropagation(); state.pop = state.pop==="bell"?null:"bell"; renderPop(); };
+  $("#user-btn").onclick = e => { e.stopPropagation(); state.pop = state.pop==="user"?null:"user"; renderPop(); };
+  renderPop();
+}
+
+function renderPop(){
+  const slot = $("#pop-slot"); if(!slot) return;
+  if(!state.pop){ slot.innerHTML=""; return; }
+  if(state.pop === "bell"){
+    const recent = [...state.audit].slice(-6).reverse();
+    slot.innerHTML = `<div class="pop" id="pop"><h4>Recent activity</h4>
+      ${recent.map(e=>`<div class="row">
+        <span class="avatar sm" style="background:${e.actor==="ai"?"linear-gradient(135deg,#4D7CFF,#7B4DFF)":e.actor==="analyst"?"linear-gradient(135deg,#E23B4E,#8A1F2D)":"#5C6B8A"}">${e.actor==="ai"?"AI":e.actor==="analyst"?user.initials:"SY"}</span>
+        <div style="min-width:0"><b>${esc(e.action.replace(/_/g," "))}</b>
+          <p>${esc(e.detail.slice(0,90))}${e.detail.length>90?"…":""}</p></div>
+        <time>${rel(e.created_at)}</time></div>`).join("") || `<div class="row"><p>No activity yet.</p></div>`}
+      <div class="sep"></div>
+      <button class="row" data-goto="audit"><b>Open full audit trail</b><span style="margin-left:auto">${ICONS.arrow}</span></button>
+    </div>`;
+  } else {
+    slot.innerHTML = `<div class="pop" id="pop" style="width:260px">
+      <div class="row"><span class="avatar">${user.initials}</span>
+        <div><b>${user.name}</b><p>${user.role}</p></div></div>
+      <div class="sep"></div>
+      <button class="row" id="pop-new"><b>+ New review session</b></button>
+      <button class="row" id="pop-theme"><b>Switch theme</b></button>
+      <div class="sep"></div>
+      ${state.sessions.slice(0,5).map(s=>`<button class="row" data-sess="${s.id}">
+        <div><b>${esc(s.name)}</b><p>file #${String(s.id).padStart(4,"0")} · ${esc(s.status)}</p></div>
+        ${s.id===state.session.id?`<span style="margin-left:auto;color:var(--low)">${ICONS.check}</span>`:""}</button>`).join("")}
+      <div class="sep"></div>
+      <button class="row" id="pop-signout"><b style="color:var(--high)">Sign out</b></button>
+    </div>`;
+    $("#pop-new").onclick = ()=>{ state.pop=null; newSession().catch(e=>toast(e.message,true)); };
+    $("#pop-theme").onclick = ()=>{ state.pop=null; toggleTheme(); };
+    $("#pop-signout").onclick = ()=>{ sessionStorage.removeItem("regloop_auth"); location.reload(); };
+    $$("[data-sess]", slot).forEach(b=>b.onclick = async ()=>{
+      state.pop = null;
+      state.session = state.sessions.find(s=>s.id===+b.dataset.sess);
+      await refresh(); 
+    });
+  }
+  $$("[data-goto]", slot).forEach(b=>b.onclick = ()=>{ state.pop=null; state.page=b.dataset.goto; render(); });
+}
+document.addEventListener("click", e => {
+  if(state.pop && !e.target.closest(".pop") && !e.target.closest("#bell") && !e.target.closest("#user-btn")){
+    state.pop = null; renderPop();
+  }
+});
+
+function toggleTheme(){
+  const html = document.documentElement;
+  html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+  try{ localStorage.setItem("regloop_theme", html.dataset.theme); }catch(e){}
+  render();
+}
+</script>
+<script>
+"use strict";
+/* ================= views ================= */
+const VIEWS = {};
+
+VIEWS.upload = () => {
+  const docs = k => state.session.documents.filter(d=>d.kind===k);
+  const colors = {regulation:"linear-gradient(135deg,#E23B4E,#8A1F2D)", policy:"linear-gradient(135deg,#4D7CFF,#2E5BFF)", matrix:"linear-gradient(135deg,#3DD68C,#0E9F6E)"};
+  const fileRows = k => docs(k).map(d=>`
+    <div class="file-row reveal"><span class="f-ic" style="background:${colors[k]}">${esc(d.filename.split(".").pop().toUpperCase().slice(0,4))}</span>
+      <div style="min-width:0"><div class="f-name">${esc(d.filename)}</div>
+      <div class="f-meta">parsed ✓ · ready for analysis</div></div>
+      <button data-del="${d.id}" title="Remove" aria-label="Remove ${esc(d.filename)}">${ICONS.x}</button></div>`).join("");
+  const ready = docs("regulation").length && docs("policy").length;
+  return `
+  <div class="page-head"><div><h2>Assemble the document set</h2>
+    <p>Upload the new regulation, up to three internal policies, and the responsibility matrix
+    that assigns an owner to each compliance domain. Drag &amp; drop works.</p></div></div>
+  <div class="upload-grid">
+    <div class="drop" data-kind="regulation"><div class="ic">${ICONS.doc}</div>
+      <h4>Regulatory document</h4><p>PDF or TXT · exactly one</p>
+      <span class="fake-btn">Choose file</span>
+      <input type="file" accept=".pdf,.txt,.md" aria-label="Upload regulatory document">${fileRows("regulation")}</div>
+    <div class="drop" data-kind="policy"><div class="ic">${ICONS.doc}</div>
+      <h4>Internal policies</h4><p>PDF or TXT · one to three</p>
+      <span class="fake-btn">Choose file</span>
+      <input type="file" accept=".pdf,.txt,.md" aria-label="Upload policy document">${fileRows("policy")}</div>
+    <div class="drop" data-kind="matrix"><div class="ic">${ICONS.doc}</div>
+      <h4>Responsibility matrix</h4><p>CSV with domain &amp; owner columns</p>
+      <span class="fake-btn">Choose file</span>
+      <input type="file" accept=".csv" aria-label="Upload responsibility matrix">${fileRows("matrix")}</div>
+  </div>
+  <div class="card" style="margin-top:18px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <button class="btn primary" id="analyze" ${!ready || state.busy ? "disabled":""}>
+      ${ICONS.bolt} ${analyzed() ? "Re-run analysis" : "Run compliance analysis"}</button>
+    <span style="color:var(--muted);font-size:13px">
+      ${ready ? "AI extracts obligations, maps policies, scores gaps and drafts amendments — then hands every decision to you."
+              : "Upload at least the regulation and one policy to enable analysis. Demo files live in <code>sample_data/</code>."}</span>
+  </div>`;
+};
+
+VIEWS.runner = () => `
+  <div class="runner card">
+    <h3 style="margin-bottom:4px">Running compliance analysis</h3>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:10px">
+      ${state.session.ai_engine === "gemini" ? "Gemini" : "The analysis engine"} is reading the documents — hang tight.</p>
+    <div id="run-steps">${[
+      ["Extracting obligations","Detecting binding requirements, citations and domains"],
+      ["Mapping policies","Matching each obligation to internal policy sections"],
+      ["Scoring gaps","Assessing coverage and assigning risk ratings"],
+      ["Drafting amendments","Writing before/after policy pull requests"],
+    ].map((s,i)=>`<div class="run-step" data-step="${i}">
+        <span class="st-ic">${i+1}</span><div><b>${s[0]}</b><p>${s[1]}</p></div></div>`).join("")}
+    </div></div>`;
+
+VIEWS.dashboard = () => {
+  const obs = state.obligations, prs = state.prs;
+  const cov = c => obs.filter(o=>o.gap && o.gap.coverage===c).length;
+  const risk = r => obs.filter(o=>o.gap && o.gap.risk===r && o.gap.coverage!=="fully_covered").length;
+  const decided = prs.filter(p=>p.status!=="pending").length;
+  const avgConf = obs.length ? obs.reduce((a,o)=>a+o.confidence,0)/obs.length : 0;
+  const openGaps = cov("not_covered")+cov("partially_covered");
+  const RC = {high:cssVar("--high"), medium:cssVar("--med"), low:cssVar("--low")};
+
+  const domains = {};
+  obs.forEach(o=>{ domains[o.domain]=(domains[o.domain]||0)+1; });
+  const domRows = Object.entries(domains).sort((a,b)=>b[1]-a[1]).map(([d,n])=>`
+    <div class="legend" style="margin-bottom:9px"><div class="row"><span class="sw" style="background:var(--violet)"></span>
+      ${esc(d)}<span class="n">${n}</span></div>
+      <div class="hbar"><i style="width:${Math.round(n/obs.length*100)}%;background:var(--violet)"></i></div></div>`).join("");
+
+  const riskData = [["high",risk("high")],["medium",risk("medium")],["low",risk("low")]].filter(d=>d[1]>0);
+  const totalOpen = riskData.reduce((a,d)=>a+d[1],0);
+  let acc=0; const C=2*Math.PI*52;
+  const segs = riskData.map(([r,n])=>{
+    const frac=n/(totalOpen||1), off=acc*C; acc+=frac;
+    return `<circle cx="70" cy="70" r="52" fill="none" stroke="${RC[r]}" stroke-width="20"
+      stroke-dasharray="${Math.max(frac*C-2,1).toFixed(1)} ${C.toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}"
+      transform="rotate(-90 70 70)"/>`;}).join("");
+
+  const covBar = ["fully_covered","partially_covered","not_covered"].map(c=>{
+    const n=cov(c); return n?`<i style="width:${(n/(obs.length||1)*100).toFixed(1)}%;background:${cssVar(COV_META[c].cvar)}" title="${COV_META[c].label}: ${n}"></i>`:"";
+  }).join("");
+
+  const recent = [...state.audit].slice(-5).reverse();
+  const dotColor = a => a==="ai"?"var(--ai)":a==="analyst"?"var(--brand)":"var(--faint)";
+
+  return `
+  <div class="page-head"><div><h2>Review at a glance</h2>
+    <p>Live state of <b>${esc(state.session.name)}</b> — coverage, risk exposure and the human review pipeline.</p></div>
+    <div class="ph-actions">
+      <button class="btn ghost sm" data-goto="audit">${ICONS.audit} Audit trail</button>
+      <button class="btn dark sm" data-goto="export">${ICONS.export} Export</button></div></div>
+  <div class="kpis">
+    <div class="kpi reveal" style="--accent:var(--ai)"><div class="k-label">Obligations</div>
+      <div class="k-val" data-count="${obs.length}">0</div>
+      <div class="k-sub">avg confidence ${(avgConf*100).toFixed(0)}%</div></div>
+    <div class="kpi reveal" style="--accent:${openGaps?"var(--high)":"var(--low)"}"><div class="k-label">Open gaps</div>
+      <div class="k-val" data-count="${openGaps}" style="color:${openGaps?"var(--high)":"var(--low)"}">0</div>
+      <div class="k-sub">${cov("not_covered")} uncovered · ${cov("partially_covered")} partial</div></div>
+    <div class="kpi reveal" style="--accent:var(--violet)"><div class="k-label">Pull requests</div>
+      <div class="k-val" data-count="${prs.length}">0</div>
+      <div class="k-sub">${prs.filter(p=>p.status==="pending").length} awaiting review</div></div>
+    <div class="kpi reveal" style="--accent:var(--low)"><div class="k-label">Review progress</div>
+      <div class="k-val">${prs.length ? Math.round(decided/prs.length*100) : 0}<span style="font-size:18px">%</span></div>
+      <div class="k-sub">${decided} of ${prs.length} decided</div></div>
+  </div>
+  <div class="charts">
+    <div class="card reveal"><h3>Risk exposure</h3>
+      <p style="font-size:12.5px;color:var(--muted)">Open gaps by risk rating</p>
+      <div style="display:flex;gap:26px;align-items:center;margin-top:12px;flex-wrap:wrap">
+        <svg width="140" height="140" role="img" aria-label="Risk donut chart">
+          ${segs || `<circle cx="70" cy="70" r="52" fill="none" stroke="var(--low-bg)" stroke-width="20"/>`}
+          <text x="70" y="67" text-anchor="middle" font-family="Space Grotesk" font-weight="700" font-size="27" fill="${cssVar("--ink")}">${totalOpen}</text>
+          <text x="70" y="85" text-anchor="middle" font-size="9.5" font-family="JetBrains Mono" fill="${cssVar("--faint")}">OPEN GAPS</text></svg>
+        <div class="legend" style="flex:1;min-width:150px">
+          ${["high","medium","low"].map(r=>`<div class="row"><span class="sw" style="background:${RC[r]}"></span>
+            ${r[0].toUpperCase()+r.slice(1)} risk<span class="n">${risk(r)}</span></div>`).join("")}
+        </div></div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:16px">Coverage across all obligations</p>
+      <div class="hbar" style="height:14px">${covBar}</div>
+      <div style="display:flex;gap:16px;font-size:12px;color:var(--muted);flex-wrap:wrap;margin-top:4px">
+        ${Object.entries(COV_META).map(([c,m])=>`<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${cssVar(m.cvar)};margin-right:5px"></span>${m.label} (${cov(c)})</span>`).join("")}</div>
+    </div>
+    <div>
+      <div class="card reveal"><h3>Obligations by domain</h3>
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Where this regulation concentrates its requirements</p>
+        ${domRows || `<p class="explain">Run the analysis to populate.</p>`}</div>
+      <div class="card reveal"><h3>Latest activity</h3>
+        <div class="activity" style="margin-top:8px">
+          ${recent.map(e=>`<div class="act-row"><span class="act-dot" style="background:${dotColor(e.actor)}"></span>
+            <div style="min-width:0"><b>${esc(e.action.replace(/_/g," "))}</b>
+              <div style="color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.detail)}</div></div>
+            <time>${rel(e.created_at)}</time></div>`).join("") || `<p class="explain">No events yet.</p>`}
+        </div></div>
+    </div>
+  </div>
+  <div class="card reveal" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <div style="flex:1;min-width:220px"><h3>Next step</h3>
+      <p style="font-size:13px;color:var(--muted)">${prs.filter(p=>p.status==="pending").length
+        ? `${prs.filter(p=>p.status==="pending").length} recommendation(s) are waiting for your decision.`
+        : "All recommendations decided — the package is ready to export."}</p></div>
+    ${prs.filter(p=>p.status==="pending").length
+      ? `<button class="btn primary" data-goto="review">Open review queue ${ICONS.arrow}</button>`
+      : `<button class="btn dark" data-goto="export">Export package ${ICONS.arrow}</button>`}
+  </div>`;
+};
+
+VIEWS.obligations = () => {
+  const q = state.q.toLowerCase();
+  const list = state.obligations.filter(o =>
+    !q || o.statement.toLowerCase().includes(q) || o.domain.toLowerCase().includes(q) || o.citation.toLowerCase().includes(q));
+  return `
+  <div class="page-head"><div><h2>Extracted obligations</h2>
+    <p>Every binding requirement detected in the regulation. Click any obligation to open its
+    full compliance trace.</p></div></div>
+  <div class="toolbar">
+    <div class="search">${ICONS.search}<input id="q" placeholder="Search statements, domains, citations…" value="${esc(state.q)}"></div>
+    <span class="pill">${list.length} of ${state.obligations.length} shown</span></div>
+  ${list.map(o=>`
+    <div class="card clickable reveal" data-trace="${o.id}" tabindex="0" role="button"
+      aria-label="Open trace for ${esc(o.citation)}">
+      <span class="trace-hint">view trace →</span>
+      <div class="ob-head">
+        <span class="chip cite">${esc(o.citation)}</span>
+        <span class="chip domain">${esc(o.domain)}</span>
+        ${o.gap ? covChip(o.gap.coverage) : ""}
+        <span class="grow"></span>${ring(o.confidence)}</div>
+      <p class="statement">${esc(o.statement)}</p></div>`).join("")
+   || emptyState("No matches","Try a different search term.")}`;
+};
+
+VIEWS.mappings = () => `
+  <div class="page-head"><div><h2>Policy mapping</h2>
+    <p>Internal policy sections semantically matched to each obligation — every match carries
+    an excerpt and the evidence behind it, for explainability.</p></div></div>
+  ${state.obligations.map(o=>`
+    <div class="card reveal"><div class="ob-head">
+        <span class="chip cite">${esc(o.citation)}</span>
+        <span class="chip domain">${esc(o.domain)}</span></div>
+      <p class="statement">${esc(o.statement)}</p>
+      ${o.mappings.length ? o.mappings.map(m=>`
+        <div class="excerpt"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <b>${esc(m.policy_document)}</b><span class="chip">${esc(m.policy_section)}</span>
+          <span style="margin-left:auto">${ring(m.confidence, 26)}</span></div>
+          <div style="margin-top:7px">${esc(m.excerpt)}</div>
+          <span class="evidence">${esc(m.evidence)}</span></div>`).join("")
+        : `<p class="explain">No matching policy section found — flagged in gap analysis.</p>`}
+    </div>`).join("")}`;
+
+VIEWS.gaps = () => {
+  const all = state.obligations.filter(o=>o.gap);
+  const list = all.filter(o =>
+    (state.covFilter==="all" || o.gap.coverage===state.covFilter) &&
+    (state.riskFilter==="all" || o.gap.risk===state.riskFilter));
+  return `
+  <div class="page-head"><div><h2>Gap analysis</h2>
+    <p>Coverage verdict and risk rating for every obligation, traceable back to the matched
+    policy evidence.</p></div></div>
+  <div class="toolbar">
+    <div class="seg" role="group" aria-label="Coverage filter">
+      ${[["all","All"],["not_covered","Not covered"],["partially_covered","Partial"],["fully_covered","Covered"]]
+        .map(([v,l])=>`<button data-cov="${v}" class="${state.covFilter===v?"on":""}">${l}</button>`).join("")}</div>
+    <div class="seg" role="group" aria-label="Risk filter">
+      ${[["all","Any risk"],["high","High"],["medium","Medium"],["low","Low"]]
+        .map(([v,l])=>`<button data-risk="${v}" class="${state.riskFilter===v?"on":""}">${l}</button>`).join("")}</div>
+    <span class="pill">${list.length} shown</span></div>
+  ${list.map(o=>`
+    <div class="card clickable reveal" data-trace="${o.id}" tabindex="0" role="button">
+      <span class="trace-hint">view trace →</span>
+      <div class="ob-head">
+        <span class="chip cite">${esc(o.citation)}</span>
+        ${covChip(o.gap.coverage)} ${riskChip(o.gap.risk)}<span class="grow"></span>
+        <span class="chip domain">${esc(o.domain)}</span></div>
+      <p class="statement">${esc(o.statement)}</p>
+      <div class="explain">${esc(o.gap.explanation)}</div></div>`).join("")
+   || emptyState("Nothing here","No gaps match the current filters.")}`;
+};
+
+function prCard(pr, compact=false){
+  return `
+    <div class="card reveal" data-pr="${pr.id}">
+      <div class="ob-head">
+        <b style="font:600 15px var(--display)">PR-${String(pr.id).padStart(3,"0")} · ${esc(pr.title)}</b>
+        <span class="grow"></span><span class="stamp ${pr.status}">${pr.status}</span></div>
+      <div class="ob-head">
+        <span class="chip cite">${esc(pr.citation)}</span>${riskChip(pr.risk)}${ring(pr.confidence, 26)}
+        <span class="grow"></span>
+        <span class="owner-tag"><span class="avatar sm" style="background:linear-gradient(135deg,#3DD68C,#0E9F6E)">${initials(pr.suggested_owner)}</span>${esc(pr.suggested_owner)}</span></div>
+      <div class="explain"><b>Gap.</b> ${esc(pr.gap_description)}</div>
+      <p class="statement" style="margin-top:10px"><b>Proposed amendment.</b> ${esc(pr.proposed_amendment)}</p>
+      <div class="diff">
+        <div class="before"><h5>− Before</h5>${esc(pr.before_text)}</div>
+        <div class="after"><h5>+ After</h5>${esc(pr.after_text)}</div></div>
+      ${pr.reviewer_note ? `<div class="explain" style="margin-top:12px"><b>Reviewer note.</b> ${esc(pr.reviewer_note)}</div>` : ""}
+      ${pr.status==="pending" && !compact ? `
+        <textarea rows="2" placeholder="Reviewer note — for Modify, type the revised amendment wording here"></textarea>
+        <div class="pr-actions">
+          <button class="btn primary sm" data-act="approve">${ICONS.check} Approve</button>
+          <button class="btn ghost sm" data-act="modify">Modify</button>
+          <button class="btn ghost sm" data-act="escalate">Escalate</button>
+          <button class="btn danger sm" data-act="reject">Reject</button>
+        </div>` : ""}
+    </div>`;
+}
+
+VIEWS.review = () => {
+  const tabs = [["pending","Pending"],["all","All"],["approved","Approved"],["modified","Modified"],["escalated","Escalated"],["rejected","Rejected"]];
+  const list = state.prs.filter(p => state.prTab==="all" || p.status===state.prTab);
+  const decided = state.prs.filter(p=>p.status!=="pending").length;
+  return `
+  <div class="page-head"><div><h2>Policy pull requests</h2>
+    <p>The AI proposes; the analyst decides — nothing is ever applied automatically.</p></div></div>
+  <div class="card flat" style="display:flex;gap:16px;align-items:center">
+    <b style="font:600 13px var(--display);white-space:nowrap">Review progress</b>
+    <div class="progress"><i style="width:${state.prs.length?decided/state.prs.length*100:0}%"></i></div>
+    <span class="pill">${decided}/${state.prs.length} decided</span></div>
+  <div class="toolbar"><div class="seg" role="group" aria-label="Status filter">
+    ${tabs.map(([v,l])=>{
+      const n = v==="all" ? state.prs.length : state.prs.filter(p=>p.status===v).length;
+      return `<button data-tab="${v}" class="${state.prTab===v?"on":""}">${l}${n?` (${n})`:""}</button>`;}).join("")}
+  </div></div>
+  ${list.map(pr=>prCard(pr)).join("")
+   || emptyState("Queue clear", state.prs.length ? "No items with this status." : "Every obligation is fully covered — no policy changes needed.")}`;
+};
+
+VIEWS.audit = () => {
+  const list = state.audit.filter(e => state.auditFilter==="all" || e.actor===state.auditFilter);
+  return `
+  <div class="page-head"><div><h2>Audit trail</h2>
+    <p>An append-only ledger of every system, AI and analyst action in this review —
+    full traceability from upload to export.</p></div></div>
+  <div class="toolbar"><div class="seg" role="group" aria-label="Actor filter">
+    ${[["all","All"],["ai","AI"],["analyst","Analyst"],["system","System"]]
+      .map(([v,l])=>`<button data-audit="${v}" class="${state.auditFilter===v?"on":""}">${l}</button>`).join("")}</div>
+    <span class="pill">${list.length} events</span></div>
+  <div class="card"><div class="timeline">
+    ${[...list].reverse().map(e=>`
+      <div class="tl-item ${esc(e.actor)}"><div class="tl-head">
+          <span class="who">${esc(e.actor)}</span>
+          <b>${esc(e.action.replace(/_/g," "))}</b>
+          ${e.reference ? `<span class="chip">${esc(e.reference)}</span>` : ""}
+          <time>${new Date(e.created_at).toLocaleString()}</time></div>
+        <p>${esc(e.detail)}</p></div>`).join("")
+     || `<p class="explain">No events yet.</p>`}
+  </div></div>`;
+};
+
+VIEWS.export = () => {
+  const id = state.session.id;
+  const pending = state.prs.filter(p=>p.status==="pending").length;
+  const counts = [
+    ["Documents", state.session.documents.length],
+    ["Obligations", state.obligations.length],
+    ["Policy mappings", state.obligations.reduce((a,o)=>a+o.mappings.length,0)],
+    ["Gap findings", state.obligations.filter(o=>o.gap).length],
+    ["Pull requests", state.prs.length],
+    ["Audit events", state.audit.length],
+  ];
+  return `
+  <div class="page-head"><div><h2>Export compliance package</h2>
+    <p>One self-contained package for auditors and stakeholders: obligations, mappings,
+    gap analysis, recommendations, decisions and the full audit trail.</p></div></div>
+  ${pending ? `<div class="card flat" style="border-color:var(--med-line);background:var(--med-bg)">
+      <b style="color:var(--med)">${pending} recommendation(s) still pending review.</b>
+      <span style="color:var(--muted)"> You can export now, but the package will record them as undecided.</span></div>` : ""}
+  <div class="card"><h3>Package contents</h3>
+    <div class="kpis" style="margin-top:12px">${counts.map(([l,n])=>`
+      <div class="kpi" style="box-shadow:none"><div class="k-label">${l}</div>
+        <div class="k-val" style="font-size:25px">${n}</div></div>`).join("")}</div>
+    <div class="pr-actions" style="margin-top:6px">
+      <a class="btn dark" href="/api/sessions/${id}/export.json">${ICONS.export} Download JSON</a>
+      <a class="btn ghost" href="/api/sessions/${id}/export.csv">${ICONS.export} Download CSV</a>
+    </div></div>`;
+};
+
+/* ================= trace drawer ================= */
+function openDrawer(obId){
+  const o = state.obligations.find(x=>x.id===obId);
+  if(!o) return;
+  const pr = state.prs.find(p => p.citation === o.citation) || null;
+  const root = $("#overlay-root");
+  root.innerHTML = `
+    <div class="drawer-veil" data-close></div>
+    <aside class="drawer" role="dialog" aria-label="Compliance trace">
+      <div class="drawer-head">
+        <span class="chip cite">${esc(o.citation)}</span>
+        <h3>Compliance trace</h3>
+        <button class="icon-btn" data-close style="margin-left:auto">${ICONS.x}</button></div>
+      <div class="drawer-body">
+        <div class="trace-step"><h4>1 · Regulatory obligation</h4>
+          <p class="statement">${esc(o.statement)}</p>
+          <div class="ob-head" style="margin-top:9px;margin-bottom:0">
+            <span class="chip domain">${esc(o.domain)}</span>${ring(o.confidence,26)}</div></div>
+        <div class="trace-step"><h4>2 · Policy evidence</h4>
+          ${o.mappings.length ? o.mappings.map(m=>`
+            <div class="excerpt" style="margin-top:8px"><b>${esc(m.policy_document)}</b>
+              <span class="chip">${esc(m.policy_section)}</span>
+              <div style="margin-top:6px">${esc(m.excerpt)}</div>
+              <span class="evidence">${esc(m.evidence)}</span></div>`).join("")
+            : `<p class="explain">No matching policy section found.</p>`}</div>
+        <div class="trace-step"><h4>3 · Gap verdict</h4>
+          ${o.gap ? `<div class="ob-head" style="margin-bottom:8px">${covChip(o.gap.coverage)} ${riskChip(o.gap.risk)}</div>
+            <p style="font-size:13px;color:var(--muted)">${esc(o.gap.explanation)}</p>`
+            : `<p class="explain">Not assessed.</p>`}</div>
+        <div class="trace-step"><h4>4 · Recommendation</h4>
+          ${pr ? `<div class="ob-head" style="margin-bottom:6px">
+              <b style="font:600 13.5px var(--display)">PR-${String(pr.id).padStart(3,"0")}</b>
+              <span class="stamp ${pr.status}" style="font-size:10px;padding:3px 9px">${pr.status}</span></div>
+            <p style="font-size:13px">${esc(pr.proposed_amendment)}</p>
+            ${pr.status==="pending" ? `<button class="btn primary sm" style="margin-top:12px" data-goto-review>Decide in review queue ${ICONS.arrow}</button>`:""}`
+            : `<p class="explain">${o.gap && o.gap.coverage==="fully_covered" ? "No change needed — obligation fully covered." : "No recommendation generated."}</p>`}</div>
+      </div></aside>`;
+  $$("[data-close]", root).forEach(el=>el.onclick = closeDrawer);
+  const gr = $("[data-goto-review]", root);
+  if(gr) gr.onclick = ()=>{ closeDrawer(); state.prTab="pending"; state.page="review"; render(); };
+  document.addEventListener("keydown", escClose);
+}
+function closeDrawer(){ $("#overlay-root").innerHTML=""; document.removeEventListener("keydown", escClose); }
+function escClose(e){ if(e.key==="Escape"){ closeDrawer(); closePalette(); } }
+
+/* ================= command palette ================= */
+let cmdState = {open:false, sel:0, q:""};
+function commands(){
+  const nav = PAGES.filter(p=>!(p.needs && !analyzed())).map(p=>({
+    label:`Go to ${p.label}`, k:"navigate", icon:ICONS[p.icon], run:()=>{ state.page=p.id; render(); }}));
+  const acts = [
+    {label:"New review session", k:"action", icon:ICONS.plus, run:()=>newSession().catch(e=>toast(e.message,true))},
+    {label:"Toggle light / dark theme", k:"action", icon:ICONS.moon, run:toggleTheme},
+  ];
+  if(analyzed()){
+    acts.push({label:"Export package (JSON)", k:"download", icon:ICONS.export,
+      run:()=>{ location.href=`/api/sessions/${state.session.id}/export.json`; }});
+    acts.push({label:"Export package (CSV)", k:"download", icon:ICONS.export,
+      run:()=>{ location.href=`/api/sessions/${state.session.id}/export.csv`; }});
+  }
+  acts.push({label:analyzed()?"Re-run compliance analysis":"Run compliance analysis", k:"action", icon:ICONS.bolt,
+    run:()=>{ state.page="upload"; render(); const a=$("#analyze"); if(a && !a.disabled) a.click(); }});
+  return [...nav, ...acts];
+}
+function openPalette(){
+  cmdState = {open:true, sel:0, q:""};
+  renderPalette();
+}
+function closePalette(){
+  cmdState.open = false;
+  const m = $("#cmd-root"); if(m) m.remove();
+}
+function renderPalette(){
+  closePalette(); cmdState.open = true;
+  const root = document.createElement("div"); root.id = "cmd-root";
+  document.body.appendChild(root);
+  const draw = () => {
+    const list = commands().filter(c=>c.label.toLowerCase().includes(cmdState.q.toLowerCase()));
+    cmdState.sel = Math.min(cmdState.sel, Math.max(list.length-1,0));
+    root.innerHTML = `
+      <div class="modal-veil" id="cmd-veil"></div>
+      <div class="modal" role="dialog" aria-label="Command palette">
+        <div class="cmd-in">${ICONS.search}
+          <input id="cmd-q" placeholder="Type a command or page…" value="${esc(cmdState.q)}" autocomplete="off"></div>
+        <div class="cmd-list">${list.map((c,i)=>`
+          <button class="cmd-item ${i===cmdState.sel?"sel":""}" data-i="${i}">
+            ${c.icon}<span>${esc(c.label)}</span><span class="ci-k">${c.k}</span></button>`).join("")
+          || `<div class="cmd-item">No matching commands</div>`}</div>
+        <div class="cmd-foot"><span><kbd>↑↓</kbd> navigate</span><span><kbd>↵</kbd> run</span><span><kbd>esc</kbd> close</span></div>
+      </div>`;
+    const input = $("#cmd-q", root);
+    input.focus(); input.setSelectionRange(input.value.length, input.value.length);
+    input.oninput = ()=>{ cmdState.q = input.value; cmdState.sel = 0; draw(); };
+    input.onkeydown = e => {
+      if(e.key==="ArrowDown"){ e.preventDefault(); cmdState.sel = Math.min(cmdState.sel+1, list.length-1); draw(); }
+      else if(e.key==="ArrowUp"){ e.preventDefault(); cmdState.sel = Math.max(cmdState.sel-1, 0); draw(); }
+      else if(e.key==="Enter" && list[cmdState.sel]){ closePalette(); list[cmdState.sel].run(); }
+      else if(e.key==="Escape"){ closePalette(); }
+    };
+    $("#cmd-veil", root).onclick = closePalette;
+    $$(".cmd-item[data-i]", root).forEach(b=>b.onclick = ()=>{ closePalette(); list[+b.dataset.i].run(); });
+  };
+  draw();
+}
+document.addEventListener("keydown", e=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="k"){ e.preventDefault();
+    cmdState.open ? closePalette() : openPalette(); }
+});
+
+/* ================= render + events ================= */
+function render(){
+  if(!state.session) return;
+  renderNav(); renderTopbar();
+  const view = VIEWS[state.page] || VIEWS.upload;
+  $("#main").innerHTML = view();
+  bind();
+  $$("[data-count]").forEach(el=>countUp(el, +el.dataset.count));
+}
+
+function bind(){
+  $$("#nav .nav-item").forEach(b => b.onclick = () => { state.page = b.dataset.page; render(); });
+  $$("#main [data-goto]").forEach(b => b.onclick = () => { state.page = b.dataset.goto; render(); });
+
+  $$(".drop").forEach(zone => {
+    const kind = zone.dataset.kind;
+    const input = $("input[type=file]", zone);
+    const send = async file => {
+      const fd = new FormData(); fd.append("kind", kind); fd.append("file", file);
+      try{
+        await api(`/api/sessions/${state.session.id}/documents`, {method:"POST", body:fd});
+        toast(`Uploaded ${file.name}`); await refresh();
+      }catch(e){ toast(e.message, true); }
+    };
+    input.onchange = () => { if(input.files.length) send(input.files[0]); };
+    zone.ondragover = e => { e.preventDefault(); zone.classList.add("over"); };
+    zone.ondragleave = () => zone.classList.remove("over");
+    zone.ondrop = e => { e.preventDefault(); zone.classList.remove("over");
+      if(e.dataTransfer.files.length) send(e.dataTransfer.files[0]); };
+  });
+
+  $$("[data-del]").forEach(b => b.onclick = async e => {
+    e.preventDefault(); e.stopPropagation();
+    await api(`/api/sessions/${state.session.id}/documents/${b.dataset.del}`, {method:"DELETE"});
+    toast("Document removed."); await refresh();
+  });
+
+  const an = $("#analyze");
+  if(an) an.onclick = runAnalysis;
+
+  const q = $("#q");
+  if(q){ q.oninput = () => { state.q = q.value; const pos = q.selectionStart; render();
+    const nq = $("#q"); nq.focus(); nq.setSelectionRange(pos,pos); }; }
+
+  $$("[data-cov]").forEach(b => b.onclick = () => { state.covFilter = b.dataset.cov; render(); });
+  $$("[data-risk]").forEach(b => b.onclick = () => { state.riskFilter = b.dataset.risk; render(); });
+  $$("[data-tab]").forEach(b => b.onclick = () => { state.prTab = b.dataset.tab; render(); });
+  $$("[data-audit]").forEach(b => b.onclick = () => { state.auditFilter = b.dataset.audit; render(); });
+
+  $$("[data-trace]").forEach(card => {
+    const open = ()=>openDrawer(+card.dataset.trace);
+    card.onclick = open;
+    card.onkeydown = e => { if(e.key==="Enter" || e.key===" "){ e.preventDefault(); open(); } };
+  });
+
+  $$("[data-act]").forEach(b => b.onclick = async e => {
+    e.stopPropagation();
+    const card = b.closest("[data-pr]");
+    const note = $("textarea", card) ? $("textarea", card).value : "";
+    const action = b.dataset.act;
+    if(action === "modify" && !note.trim()){
+      toast("Type the revised amendment in the note box first, then press Modify.", true); return;
+    }
+    try{
+      await api(`/api/sessions/${state.session.id}/pull-requests/${card.dataset.pr}/decision`, {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({action, note, modified_amendment: action==="modify"?note:"", owner:""}),
+      });
+      const past = {approve:"approved", reject:"rejected", modify:"modified", escalate:"escalated"}[action];
+      toast(`Recommendation ${past}.`); await refresh();
+    }catch(e2){ toast(e2.message, true); }
+  });
+}
+
+async function runAnalysis(){
+  state.busy = true;
+  $("#main").innerHTML = VIEWS.runner();
+  const steps = $$("#run-steps .run-step");
+  let i = 0;
+  const advance = () => {
+    if(i > 0){ steps[i-1].classList.replace("doing","done"); steps[i-1].querySelector(".st-ic").innerHTML = ICONS.check; }
+    if(i < steps.length){ steps[i].classList.add("doing");
+      steps[i].querySelector(".st-ic").innerHTML = `<span class="spin"></span>`; i++; }
+  };
+  advance();
+  const timer = setInterval(()=>{ if(i < steps.length) advance(); }, 2400);
+  try{
+    await api(`/api/sessions/${state.session.id}/analyze`, {method:"POST"});
+    clearInterval(timer);
+    steps.forEach(s=>{ s.classList.remove("doing"); s.classList.add("done");
+      s.querySelector(".st-ic").innerHTML = ICONS.check; });
+    state.busy = false;
+    await new Promise(r=>setTimeout(r, 500));
+    await refresh("dashboard");
+    toast("Analysis complete — review the findings.");
+  }catch(e){
+    clearInterval(timer); state.busy = false; render(); toast(e.message, true);
+  }
+}
+
+/* ================= auth splash ================= */
+function showAuth(onDone){
+  const root = $("#auth-root");
+  root.innerHTML = `
+  <div class="auth" id="auth">
+    <div class="auth-left">
+      <div class="brand"><div class="mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="brand-text"><b>RegLoop AI</b><span>Compliance OS</span></div></div>
+      <h2>Regulatory change, reviewed in minutes.</h2>
+      <p class="tag">RegLoop turns new regulations into structured obligations, maps them to your
+        policies, surfaces the gaps and drafts the amendments — while every decision stays human.</p>
+      <div class="auth-feat"><span class="fi">${ICONS.doc}</span><span><b>Obligation extraction</b> with citations, domains and confidence scores</span></div>
+      <div class="auth-feat"><span class="fi">${ICONS.gap}</span><span><b>Gap analysis</b> with risk ratings and written, traceable explanations</span></div>
+      <div class="auth-feat"><span class="fi">${ICONS.review}</span><span><b>Human-in-the-loop review</b> — the AI proposes, the analyst decides</span></div>
+      <div class="auth-feat"><span class="fi">${ICONS.audit}</span><span><b>Append-only audit trail</b> from upload to exported package</span></div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-card">
+        <h3>Welcome back</h3>
+        <p class="sub">Sign in to your compliance workspace.</p>
+        <label for="auth-email">Work email</label>
+        <input id="auth-email" type="email" value="a.sharma@meridianbank.example" autocomplete="off">
+        <button class="btn primary" id="auth-go" style="width:100%;justify-content:center">
+          Continue as Compliance Analyst ${ICONS.arrow}</button>
+        <p class="auth-note">Prototype build — authentication is simulated for the demo.</p>
+      </div>
+    </div>
+  </div>`;
+  $("#auth-go").onclick = () => {
+    try{ sessionStorage.setItem("regloop_auth","1"); }catch(e){}
+    const a = $("#auth");
+    a.style.transition = "opacity .35s"; a.style.opacity = "0";
+    setTimeout(()=>{ root.innerHTML=""; onDone(); }, 360);
+  };
+  $("#auth-email").onkeydown = e => { if(e.key==="Enter") $("#auth-go").click(); };
+}
+
+/* ================= boot ================= */
+function skeleton(){
+  $("#main").innerHTML = `
+    <div class="skel" style="height:34px;width:300px;margin-bottom:10px"></div>
+    <div class="skel" style="height:16px;width:460px;margin-bottom:24px"></div>
+    <div class="kpis">${`<div class="skel" style="height:104px"></div>`.repeat(4)}</div>
+    <div class="skel" style="height:280px"></div>`;
+}
+
+async function boot(){
+  $("#app").hidden = false;
+  skeleton();
+  try{
+    state.sessions = await api("/api/sessions");
+    if(!state.sessions.length){
+      const fd = new FormData(); fd.append("name", "Compliance Review");
+      await api("/api/sessions", {method:"POST", body:fd});
+      state.sessions = await api("/api/sessions");
+    }
+    state.session = state.sessions[0];
+    await refresh();
+    state.page = analyzed() ? "dashboard" : "upload";
+    render();
+  }catch(e){
+    $("#main").innerHTML = `<div class="page-head"><div><h2>Cannot reach the RegLoop API</h2>
+      <p>${esc(e.message)} — start the backend with <code>python -m uvicorn backend.main:app --reload</code>
+      and reload this page.</p></div></div>`;
+  }
+}
+
+(function init(){
+  try{
+    const saved = localStorage.getItem("regloop_theme");
+    if(saved) document.documentElement.dataset.theme = saved;
+  }catch(e){}
+  let authed = false;
+  try{ authed = sessionStorage.getItem("regloop_auth") === "1"; }catch(e){}
+  if(authed) boot(); else showAuth(boot);
+})();
+</script>
+</body>
+</html>

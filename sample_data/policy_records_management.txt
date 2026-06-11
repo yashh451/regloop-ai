@@ -1,0 +1,18 @@
+RECORDS MANAGEMENT POLICY
+Version 3.1 — Internal Policy Document
+
+1. Purpose
+This policy defines how the organization creates, stores and disposes of business records.
+
+5. Retention Schedules
+
+5.3 Customer transaction records shall be retained for seven years in the corporate
+archive system. Records are stored on write-once media to ensure they remain
+tamper-evident throughout the retention period.
+
+5.4 Upon expiry of the retention period, records are securely destroyed and a
+certificate of destruction is filed.
+
+6. Retrieval
+6.1 Archived records can be retrieved by the Records Management team upon written
+request. Standard retrieval time is ten business days.
